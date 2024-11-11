@@ -13,9 +13,9 @@
         </div>
         <div class="token-details">
           <div class="token-name">Ethereum</div>
-          <div class="token-amount">{{ ethValue }} ETH</div>
+          <div class="token-amount">{{ ethValue.toFixed(4) }} ETH</div>
         </div>
-        <div class="token-price">${{ ethUsdtValue }} USD</div>
+        <div class="token-price">${{ ethUsdtValue.toFixed(2) }} USD</div>
       </div>
     </div>
   </template>
