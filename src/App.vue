@@ -1,17 +1,16 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <Home msg="Miz Wallet"/>
+    <router-view></router-view> 
   </div>
 </template>
 
 <script>
-import Home from './components/Home.vue'
+
 
 export default {
   name: 'App',
   components: {
-    Home
+
   }
 }
 </script>

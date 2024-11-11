@@ -1,12 +1,35 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>Miz Wallet</h1>
     <div>
       <el-row v-if="showHome">
         <el-button type="primary" plain @click="showCreate">创建钱包</el-button>
-        <el-button type="success" plain @click="showCreateWallet = false">连接钱包</el-button>
+        <el-button type="success" plain @click="showCreateWallet = false,connectWallet=true,showHome=false">连接钱包</el-button>
       </el-row>
     </div>
+
+    <!-- 连接钱包 -->
+    <div v-if="connectWallet" style="width: 600px; margin-left: 26%;">
+      <el-card>
+
+        <div class="container">
+          <span><h3>请输入私钥</h3> </span>
+          <span style="margin-top: -10px;">  <i class="el-icon-close" @click="hideKeyConnect" style="cursor: pointer"></i></span>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <el-input
+              type="textarea"
+              autosize
+              v-model="privateKey">
+            </el-input>
+        </div>
+
+        <el-button style="margin-top: 30px;" type="success" @click="doNext('connect')">连接钱包</el-button>
+
+      </el-card>
+    </div>
+
 
     <!-- 助记词 -->
     <div v-if="showCreateWallet" style="width: 600px; margin-left: 26%;">
@@ -30,7 +53,7 @@
             <i class="el-icon-document-checked" v-else>已复制到粘贴板</i>
           </div>
 
-          <el-button type="success" @click="doNext('mnemonic')">下一步</el-button>
+          <el-button style="margin-top: 10px;" type="success" @click="doNext('mnemonic')">下一步</el-button>
         </div>
       </el-card>
     </div>
@@ -66,7 +89,7 @@
     </div>
 
     <!-- 地址和公私钥 -->
-    <div v-if="showKey" style="width: 800px; margin-left: 26%;">
+    <div v-if="showKey" >
       <el-card>
 
         <div class="container">
@@ -82,10 +105,17 @@
         <p>公钥</p>
         <p>{{ publicKey }}</p>
 
-        <p>私钥</p>
-        <p>{{ privateKey }}</p>
+        <div>
+          <p>私钥</p>
+          <p style="color: red;" v-if="showPrivateKey" >{{ privateKey }}</p>
+          <p v-else>************************************************************ <i class="el-icon-unlock" @click="doShowPrivateKey" title="显示私钥" style="cursor: pointer"></i></p>
+          <i class="el-icon-document-copy" v-if="!copyPrivateKey" @click="doCopyPrivateKey" title="点击复制私钥" style="cursor: pointer"></i>
+          <i class="el-icon-document-checked" v-else>已复制私钥到粘贴板</i>
+
+      </div>
+ 
         
-        <el-button type="success" @click="doNext('connect')">连接钱包</el-button>
+        <el-button style="margin-top: 10px;" type="success" @click="doNext('connect')">连接钱包</el-button>
 
       </el-card>
     </div>
@@ -97,18 +127,18 @@
 import axios from 'axios';
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
-  },
   data() {
     return {
       loading:true,
 
       showHome : true,
+      connectWallet : false,
       showCreateWallet : false,
       showMnemonic :false,
       showKey : false,
       copy : false,
+      copyPrivateKey : false,
+      showPrivateKey : false,
 
       inputMnemonic:[],
       randomIndex : [],
@@ -118,7 +148,8 @@ export default {
       originalWords: "",
       address: "",
       privateKey: "",
-      publicKey:""
+      publicKey:"",
+
     };
   },
   methods:{
@@ -127,14 +158,21 @@ export default {
       this.showKey = true;
     },
     hideKeyPage(){
+      this.inputMnemonic = [];
       this.showHome = true;
       this.showKey = false;
+    },
+    hideKeyConnect(){
+      this.inputMnemonic = [];
+      this.showHome = true;
+      this.connectWallet = false;
     },
     showMnemonicPage(){
       this.showHome = false;
       this.showMnemonic = true;
     },
     hideMnemonic(){
+      this.inputMnemonic = [];
       this.showHome = true;
       this.showMnemonic = false;
     },
@@ -142,7 +180,7 @@ export default {
 
       this.showHome = false;
       this.showCreateWallet = true;
-      axios.get('http://152.32.219.36:8080/generateMnemonic')
+      axios.get('http://localhost:8080/generateMnemonic')
         .then(res => {
           this.originalWords = res.data;
           this.words = res.data.split(' ');
@@ -154,6 +192,7 @@ export default {
   
     },
     hideCreate(){
+      this.inputMnemonic = [];
       this.showHome = true;
       this.showCreateWallet = false;
     },
@@ -182,18 +221,20 @@ export default {
         this.showMnemonicPage();
       }else if(tab == "privateKey"){
         let ok = true;
-        for (let key in this.inputMnemonic) {
-            if(!this.inputMnemonic[key] == ''){
-              // console.log(`key: ${key}, value: ${this.inputMnemonic[key]}`);
-              if(this.words[key] != this.inputMnemonic[key]){
-                ok = false;
-                break;
-              }
-            }
-        }
+        // for (let key in this.inputMnemonic) {
+        //     if(!this.inputMnemonic[key] == ''){
+        //       // console.log(`key: ${key}, value: ${this.inputMnemonic[key]}`);
+        //       if(this.words[key] != this.inputMnemonic[key]){
+        //         ok = false;
+        //         break;
+        //       }else{
+        //         ok = true;
+        //       }
+        //     }
+        // }
 
         if(ok){
-          axios.post('http://152.32.219.36:8080/generateOrRecoverWallet',this.originalWords)
+          axios.post('http://localhost:8080/generateOrRecoverWallet',this.originalWords)
             .then(res => {
               this.address = res.data.address;
               this.publicKey = res.data.publicKey;
@@ -201,10 +242,9 @@ export default {
               this.showMnemonic = false;
               this.showHome = false;
               this.showKeyPage();
-            })
-            .catch(error => {
+            }).catch(error => {
               console.error('请求失败:', error);
-          });
+            });
         }else{
           this.$notify.error({
             title: '验证失败',
@@ -212,16 +252,48 @@ export default {
           });
         }
 
+      }else if(tab == "connect"){
+        if(this.privateKey == ''){
+          this.$notify.error({
+            title: '连接失败',
+            message: '请输入私钥后再次重试.'
+          });
+        }else{
+          axios.post('http://localhost:8080/importWalletByPrivateKey',this.privateKey,
+          {
+            headers: {
+              'Content-Type': 'application/json'  // 明确设置 Content-Type
+            }
+          }).then(res => {
+            this.$notify({
+              title: '成功',
+              message: '钱包连接成功',
+              type: 'success'
+            });
+
+            this.$store.commit('setConnectedAddress', res);
+            this.$store.commit('setPrivateKey', this.privateKey);
+
+            this.$router.push('/wallet');
+          }).catch(error => {
+            console.error('连接失败:', error);
+          });
+        }
       }
     },
 
-    async copyText() {
-      try {
-        await navigator.clipboard.writeText(this.originalWords); // 将文本写入剪贴板
-        this.copy = true;
-      } catch (err) {
-        console.error('复制失败:', err);
-      }
+    doShowPrivateKey(){
+      this.showPrivateKey = true;
+    },
+
+    doCopyPrivateKey(){
+      navigator.clipboard.writeText(this.privateKey); // 将文本写入剪贴板
+      this.copyPrivateKey = true;
+    },
+
+    copyText() {
+      navigator.clipboard.writeText(this.originalWords); // 将文本写入剪贴板
+      this.copy = true;
     }
   }
 
