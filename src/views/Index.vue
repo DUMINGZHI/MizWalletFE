@@ -1,13 +1,13 @@
 <template>
-  <div class="hello" v-loading="loading">
+  <div class="wallet" v-loading="loading">
     <div>
       <div class="address-container">
         <span class="address-text">{{ whatAddress() }}</span>
         <div><i class="el-icon-document-copy" @click="doCopyAddress" title="点击复制地址" style="cursor: pointer"></i></div>
       </div>
 
-      <p style="font-weight: bold;">{{ balance.toFixed(4) }} ETH</p>
-      <p style="margin-top: -12px;font-size: 12px;">${{ usdtBalance.toFixed(2) }} USD</p>
+      <p style="font-weight: bold;">{{ balance }} ETH</p>
+      <p style="margin-top: -12px;font-size: 12px;">${{ usdtBalance }} USD</p>
     </div>
     
     <div>
@@ -15,16 +15,16 @@
         <IconButton label="Buy">
           <span><i class="el-icon-circle-plus-outline"></i></span> 
         </IconButton>
-        <IconButton label="Send">
-          <span>↗️</span>
+        <IconButton style="cursor: pointer;" label="Send" >
+          <span @click="handleSendClick">↗️</span>
         </IconButton>
-        <IconButton label="Swap">
+        <IconButton style="cursor: pointer;" label="Swap">
           <span>🔄</span>
         </IconButton>
-        <IconButton label="Bridge">
+        <IconButton style="cursor: pointer;" label="Bridge">
           <span>🔁</span>
         </IconButton>
-        <IconButton label="Portfolio">
+        <IconButton style="cursor: pointer;" label="Portfolio">
           <span>📈</span>
         </IconButton>
       </div>
@@ -52,7 +52,9 @@ export default {
       loading:true,
       address:"",
       usdtBalance:"",
-      balance:""
+      balance:"",
+
+      showSendPage:false
     };
   },
   mounted(){
@@ -69,6 +71,12 @@ export default {
       });
   },
   methods:{
+    handleSendClick(){
+      console.log("gotosend");
+      
+      this.$router.push('/send');
+    },
+
     whatAddress(){
       return this.address.substring(0,5) + "..." + this.address.substring(this.address.length-4,this.address.length)
     },
@@ -108,5 +116,12 @@ export default {
       display: flex;
       justify-content: space-around;
       padding: 20px;
+    }
+    .wallet{
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
+      height: 500px;
     }
 </style>

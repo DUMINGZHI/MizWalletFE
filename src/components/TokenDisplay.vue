@@ -13,22 +13,22 @@
         </div>
         <div class="token-details">
           <div class="token-name">Ethereum</div>
-          <div class="token-amount">{{ ethValue.toFixed(4) }} ETH</div>
+          <div class="token-amount">{{ ethValue }} ETH</div>
         </div>
-        <div class="token-price">${{ ethUsdtValue.toFixed(2) }} USD</div>
+        <div class="token-price">${{ ethUsdtValue }} USD</div>
       </div>
     </div>
   </template>
   
   <script>
+
+
   export default {
     props:{
         ethValue: {
-            type: String,
             required: true
         },
         ethUsdtValue: {
-            type: String,
             required: true
         }
     },
@@ -68,7 +68,6 @@
   .token-info {
     display: flex;
     align-items: center;
-    margin-left: 10px;
     margin-right: 10px;
   }
   

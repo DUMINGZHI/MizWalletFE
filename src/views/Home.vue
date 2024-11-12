@@ -9,7 +9,7 @@
     </div>
 
     <!-- 连接钱包 -->
-    <div v-if="connectWallet" style="width: 600px; margin-left: 26%;">
+    <div v-if="connectWallet">
       <el-card>
 
         <div class="container">
@@ -32,7 +32,7 @@
 
 
     <!-- 助记词 -->
-    <div v-if="showCreateWallet" style="width: 600px; margin-left: 26%;">
+    <div v-if="showCreateWallet">
       <el-card >
 
         <div class="container">
@@ -59,7 +59,7 @@
     </div>
 
     <!-- 验证助记词 -->
-    <div v-if="showMnemonic" style="width: 600px; margin-left: 26%;">
+    <div v-if="showMnemonic">
       <el-card >
         <div class="container">
           <span><h3>验证助记词</h3> </span>
@@ -124,7 +124,9 @@
 </template>
 
 <script>
+
 import axios from 'axios';
+
 export default {
   name: 'HelloWorld',
   data() {

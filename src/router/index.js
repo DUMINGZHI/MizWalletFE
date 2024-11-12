@@ -6,6 +6,7 @@ import Router from 'vue-router';
 // 导入组件
 import Home from '../views/Home.vue';
 import Wallet from '../views/Index.vue';
+import Send from '../views/Send.vue';
 
 // 使用 Vue Router 插件
 Vue.use(Router);
@@ -23,6 +24,11 @@ export default new Router({
       path: '/wallet',
       name: 'wallet',
       component: Wallet
+    },
+    {
+      path: '/send',
+      name: 'send',
+      component: Send
     }
   ]
 });
