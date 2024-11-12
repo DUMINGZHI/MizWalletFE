@@ -27,16 +27,9 @@
   }
   
   .icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #1a73e8; /* 蓝色背景 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    margin-bottom: 5px;
+
+    font-size: 40px;
+
   }
   
   .label {

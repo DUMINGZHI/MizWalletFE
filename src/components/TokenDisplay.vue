@@ -42,6 +42,7 @@
   
   <style scoped>
   .token-display {
+    padding-top: 10px;
     font-family: Arial, sans-serif;
     color: #333;
   }

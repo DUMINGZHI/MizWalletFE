@@ -19,21 +19,46 @@
           </div>
           <span class="dropdown-arrow">▼</span>
         </div>
+        <!-- From Account Drop list-->
+        <div v-show="showAccountDropdown" style="background-color: rgb(255, 255, 255);border: 1px solid rgb(204, 204, 204);box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px;">
+          <el-card>
+            <div class="account-info" style="display: flex;">
+              <div class="account-avatar orange"></div>
+              <div class="account-details" style="width: 83%;text-align: left;">
+                <div class="account-name">Account 1</div>
+                <div class="account-address">{{ whatAddress() }}</div>
+              </div>
+              <i class="el-icon-circle-check"></i>
+            </div>
+          </el-card>
+        </div>
       </div>
-  
+
       <!-- To Address Section -->
       <div class="input-section">
         <label>To</label>
         <div class="address-input">
           <input 
             type="text" 
-            placeholder="Enter public address (0x) or domain nam"
+            placeholder="Enter public address (0x) or domain name"
+            style="font-size: 13px;"
+             @blur="handleBlur"
             v-model="toAddress"
           >
           <button class="scan-button">
-            <span class="scan-icon" @click="toAddress=''">⟲</span>
+            <span class="scan-icon" @click="readText()" title="粘贴"><i class="el-icon-document-copy"></i></span>
           </button>
         </div>
+
+        <p style="text-align: left;font-size: 10px;" :style="validAddress ? 'color:green;' :'color:red;font-weight: bold;' ">{{ validAddressRes }}</p>
+
+        <input 
+            v-if="validAddress"
+            type="number" 
+            placeholder="Enter transfer amount"
+            style="font-size: 13px;"
+            v-model="transferAmount"
+          >
       </div>
   
       <!-- Account Lists -->
@@ -71,7 +96,7 @@
       <!-- Action Buttons -->
       <div class="action-buttons">
         <button class="cancel-button" @click="back">Cancel</button>
-        <button class="continue-button">Continue</button>
+        <button class="continue-button" @click="checkBeforeSend">Continue</button>
       </div>
     </div>
   </template>
@@ -91,6 +116,9 @@
         address:"",
         usdtBalance:"",
         balance:"",
+        validAddress:false,
+        validAddressRes:"",
+        transferAmount:0
       }
     },
     mounted(){
@@ -116,6 +144,101 @@
       whatAddress(){
         return this.address.substring(0,5) + "..." + this.address.substring(this.address.length-4,this.address.length)
       },
+      handleBlur(){
+        axios.get('http://localhost:8080/isValidAddress/'+this.toAddress)
+        .then(res => {
+          this.validAddress = res.data;
+          if(res.data){
+            this.validAddressRes = "Correctly formatted address"
+          }else{
+             this.validAddressRes = "Address in illegal format"
+          }
+        })
+        .catch(error => {
+          this.loading = false;
+          console.error('请求失败:', error);
+          return;
+        });
+      },
+      async readText(){
+        try {
+          // 读取剪贴板中的文本
+          const text = await navigator.clipboard.readText();
+          this.toAddress = text;
+        } catch (err) {
+          console.error("无法读取剪贴板内容：", err);
+        }
+      },
+      checkBeforeSend(){
+        this.loading = true;
+        if(this.toAddress == ''){
+          this.$notify.error({
+            title: '转账失败',
+            message: '请填写正确的地址.'
+          });
+          this.loading = false;
+          return;
+        }
+
+        if(this.transferAmount <= 0){
+          this.$notify.error({
+            title: '转账失败',
+            message: '请填写正确的转账金额.'
+          });
+          this.loading = false;
+          return;
+        }
+
+        if(this.balance == 0){
+          this.$notify.error({
+            title: '转账失败',
+            message: '没有足够的余额进行转账.'
+          });
+          this.loading = false;
+          return;
+        }
+
+        //1.Gas check
+        // axios.get('http://localhost:8080/checkGas')
+        // .then(res => {
+        //   if(!res.data){
+        //       this.$notify.error({
+        //         title: '转账失败',
+        //         message: 'Gas费不足.'
+        //       });
+        //       this.loading = false;
+        //     return;
+        //   }
+        // })
+        // .catch(error => {
+        //   this.loading = false;
+        //   console.error('请求失败:', error);
+        //   return;
+        // });
+      
+        let transaction = {
+          value:this.transferAmount,
+          fromAddress:this.address,
+          toAddress:this.toAddress
+        };
+
+        this.$alert('确认转账吗?此操作不可逆转,且无法追踪地址信息.', '提示', {
+          confirmButtonText: '确定',
+          callback: () => {
+            axios.post('http://localhost:8080/sendTransaction',transaction)
+            .then(res => {
+              this.$notify({
+                title: '成功',
+                message: '已成功转账,Gas费用为:.' + res.data,
+                type: "success"
+              });
+            }).catch(error => {
+              console.error('请求失败:', error);
+            });
+          }
+        });
+
+      }
     }
   }
   </script>

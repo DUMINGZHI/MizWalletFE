@@ -13,18 +13,18 @@
     <div>
       <div class="icon-container">
         <IconButton label="Buy">
-          <span><i class="el-icon-circle-plus-outline"></i></span> 
+          <span>↪️</span> 
         </IconButton>
         <IconButton style="cursor: pointer;" label="Send" >
           <span @click="handleSendClick">↗️</span>
         </IconButton>
-        <IconButton style="cursor: pointer;" label="Swap">
+        <IconButton label="Swap">
           <span>🔄</span>
         </IconButton>
-        <IconButton style="cursor: pointer;" label="Bridge">
+        <IconButton label="Bridge">
           <span>🔁</span>
         </IconButton>
-        <IconButton style="cursor: pointer;" label="Portfolio">
+        <IconButton label="Portfolio">
           <span>📈</span>
         </IconButton>
       </div>
@@ -115,7 +115,7 @@ export default {
     .icon-container {
       display: flex;
       justify-content: space-around;
-      padding: 20px;
+      padding: 10px;
     }
     .wallet{
       padding: 16px;

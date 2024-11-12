@@ -223,17 +223,17 @@ export default {
         this.showMnemonicPage();
       }else if(tab == "privateKey"){
         let ok = true;
-        // for (let key in this.inputMnemonic) {
-        //     if(!this.inputMnemonic[key] == ''){
-        //       // console.log(`key: ${key}, value: ${this.inputMnemonic[key]}`);
-        //       if(this.words[key] != this.inputMnemonic[key]){
-        //         ok = false;
-        //         break;
-        //       }else{
-        //         ok = true;
-        //       }
-        //     }
-        // }
+        for (let key in this.inputMnemonic) {
+            if(!this.inputMnemonic[key] == ''){
+              // console.log(`key: ${key}, value: ${this.inputMnemonic[key]}`);
+              if(this.words[key] != this.inputMnemonic[key]){
+                ok = false;
+                break;
+              }else{
+                ok = true;
+              }
+            }
+        }
 
         if(ok){
           axios.post('http://localhost:8080/generateOrRecoverWallet',this.originalWords)
