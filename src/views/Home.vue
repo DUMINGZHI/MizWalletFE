@@ -99,9 +99,10 @@
         <div v-else>
           <p>请输入空缺的助记词进行安全验证.</p>
           <div class="word-grid">
-            <div v-for="(word, index) in words" :key="index">
+            <div class="word-item" v-for="(word, index) in words" :key="index">
               <span v-if="checkMnemonic(index)"> 
                 <el-input
+                  style="width: 70px;"
                   v-model="inputMnemonic[index]"
                   >
                 </el-input>
@@ -251,7 +252,7 @@ export default {
         this.showCreateWallet = false;
         this.showMnemonicPage();
       }else if(tab == "privateKey"){
-        let ok = true;
+        let ok = false;
         for (let key in this.inputMnemonic) {
             if(!this.inputMnemonic[key] == ''){
               // console.log(`key: ${key}, value: ${this.inputMnemonic[key]}`);
