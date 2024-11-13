@@ -4,11 +4,38 @@
     <div>
       <el-row v-if="showHome">
         <el-button type="primary" plain @click="showCreate">创建钱包</el-button>
-        <el-button type="success" plain @click="showCreateWallet = false,connectWallet=true,showHome=false">连接钱包</el-button>
+        <el-button type="success" plain @click="showCreateWallet = false,connectWalletM=true,showHome=false">助记词导入钱包</el-button>
+        <el-button type="success" plain @click="showCreateWallet = false,connectWallet=true,showHome=false">私钥导入钱包</el-button>
       </el-row>
     </div>
 
-    <!-- 连接钱包 -->
+   <!-- 助记词导入钱包 -->
+   <div v-if="connectWalletM">
+      <el-card>
+
+        <div class="container">
+          <span><h3>请填写助记词</h3> </span>
+          <span style="margin-top: -10px;">  <i class="el-icon-close" @click="hideKeyConnect" style="cursor: pointer"></i></span>
+        </div>
+
+        <div class="word-grid" style="margin-top: 10px;">
+            <div v-for="(_, index) in 12" :key="index">
+              <span> 
+                <el-input
+                  style="width:80px;"
+                  v-model="inputConnectMnemonic[index]"
+                  >
+                </el-input>
+              </span>
+            </div>
+          </div>
+
+        <el-button style="margin-top: 30px;" type="success" @click="doNext('connectM')">导入钱包</el-button>
+
+      </el-card>
+    </div>
+
+    <!-- 私钥导入钱包 -->
     <div v-if="connectWallet">
       <el-card>
 
@@ -25,7 +52,7 @@
             </el-input>
         </div>
 
-        <el-button style="margin-top: 30px;" type="success" @click="doNext('connect')">连接钱包</el-button>
+        <el-button style="margin-top: 30px;" type="success" @click="doNext('connect')">导入钱包</el-button>
 
       </el-card>
     </div>
@@ -72,7 +99,7 @@
         <div v-else>
           <p>请输入空缺的助记词进行安全验证.</p>
           <div class="word-grid">
-            <div class="word-item" v-for="(word, index) in words" :key="index">
+            <div v-for="(word, index) in words" :key="index">
               <span v-if="checkMnemonic(index)"> 
                 <el-input
                   v-model="inputMnemonic[index]"
@@ -135,6 +162,7 @@ export default {
 
       showHome : true,
       connectWallet : false,
+      connectWalletM : false,
       showCreateWallet : false,
       showMnemonic :false,
       showKey : false,
@@ -143,6 +171,7 @@ export default {
       showPrivateKey : false,
 
       inputMnemonic:[],
+      inputConnectMnemonic:[],
       randomIndex : [],
       text : "12344",
 
@@ -151,7 +180,6 @@ export default {
       address: "",
       privateKey: "",
       publicKey:"",
-
     };
   },
   methods:{
@@ -168,6 +196,7 @@ export default {
       this.inputMnemonic = [];
       this.showHome = true;
       this.connectWallet = false;
+      this.connectWalletM = false;
     },
     showMnemonicPage(){
       this.showHome = false;
@@ -267,11 +296,6 @@ export default {
               'Content-Type': 'application/json'  // 明确设置 Content-Type
             }
           }).then(res => {
-            this.$notify({
-              title: '成功',
-              message: '钱包连接成功',
-              type: 'success'
-            });
 
             this.$store.commit('setConnectedAddress', res);
             this.$store.commit('setPrivateKey', this.privateKey);
@@ -281,6 +305,33 @@ export default {
             console.error('连接失败:', error);
           });
         }
+      }else if(tab == "connectM"){
+
+
+        if (this.inputConnectMnemonic.length !== 12 || this.inputConnectMnemonic.every(element => element == undefined || element == null || element == '')) {
+          this.$notify.error({
+            title: '连接失败',
+            message: '请输入正确的助记词后再次重试.'
+          });
+        }
+
+        let req = this.inputConnectMnemonic.join(' ');
+    
+        axios.post('http://localhost:8080/generateOrRecoverWallet',req,
+        {
+          headers: {
+            'Content-Type': 'application/json'  // 明确设置 Content-Type
+          }
+        }).then(res => {
+  
+          this.$store.commit('setConnectedAddress', res.data.address);
+          this.$store.commit('setPrivateKey', res.data.privateKey);
+
+          this.$router.push('/wallet');
+        }).catch(error => {
+          console.error('连接失败:', error);
+        });
+        
       }
     },
 

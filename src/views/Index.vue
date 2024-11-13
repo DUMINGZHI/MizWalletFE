@@ -60,6 +60,13 @@ export default {
   mounted(){
     axios.get('http://localhost:8080/walletBalance/')
         .then(res => {
+          
+          this.$notify({
+            title: '成功',
+            message: '钱包连接成功',
+            type: 'success'
+          });
+
           this.balance = res.data.balance;
           this.address = res.data.address;
           this.usdtBalance = res.data.usdtBalance;
