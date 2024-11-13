@@ -3,11 +3,15 @@
 
 开发进度以及顺序
 
-ETC钱包(开发中)
-优化前端,多语言国际化页面,提示语,UI精细,统一Api接口调用等(TODO)
-数据传输安全性优化(TODO)
-BTC(TODO)
-Sol(TODO)
+1.ETC钱包
+
+2.优化前端,多语言国际化页面,提示语,UI精细,统一Api接口调用等
+
+3.数据传输安全性优化
+
+4.BTC钱包
+
+5.Sol钱包
 
 后端工程:https://github.com/DUMINGZHI/MizWallet
 
