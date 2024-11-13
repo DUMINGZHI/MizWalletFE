@@ -14,7 +14,7 @@
 5.Sol钱包(TODO)
 
 
-后端工程:https://github.com/DUMINGZHI/MizWallet
+后端代码仓库：https://github.com/DUMINGZHI/MizWallet
 
 ## Project setup
 ```
