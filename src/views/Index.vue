@@ -40,6 +40,7 @@
 import axios from 'axios';
 import IconButton from '../components/IconButton.vue';
 import TokenDisplay from '../components/TokenDisplay.vue';
+import Cookies from 'js-cookie';
 
 export default {
   components: {
@@ -58,29 +59,88 @@ export default {
     };
   },
   mounted(){
-    axios.get('http://localhost:8080/walletBalance/')
-        .then(res => {
-          
-          this.$notify({
-            title: '成功',
-            message: '钱包连接成功',
-            type: 'success'
-          });
 
-          this.balance = res.data.balance;
-          this.address = res.data.address;
-          this.usdtBalance = res.data.usdtBalance;
-          this.loading = false;
-        })
-        .catch(error => {
-          this.loading = false;
-          console.error('请求失败:', error);
-      });
+    this.restoreSession();
+
   },
   methods:{
+    restoreSession(){
+
+
+      const wid = Cookies.get('wid');
+      if (wid) {
+          // 使用 wid 恢复登录状态
+          this.checkLoginStatus(wid);
+      }else{
+        this.$notify.error({
+          title: '失败',
+          message: '连接钱包失败请重试.'
+        });
+        this.$router.push('/');
+      }
+    },
+
+    startHeartbeat(wid) {
+      setInterval(() => {
+        axios.get('http://localhost:8080/heartbeat/'+wid)
+          .then((response) => {
+            if (response.data) {
+                console.log('Heartbeat sent successfully');
+            } else {
+                console.error('Heartbeat failed');
+                this.$notify.error({
+                  title: '失败',
+                  message: '连接钱包失败请重试.'
+                });
+                Cookies.set('wid',"");
+                this.$router.push('/');
+            }
+          });
+      }, 60000); // 每分钟发送一次
+
+    },
+
+    checkLoginStatus(wid) {
+      axios.get('http://localhost:8080/checkLoginStatus/'+wid)
+      .then(res => {
+          if (res.data) {
+            console.log('恢复连接成功');
+            this.startHeartbeat(wid);
+
+            axios.get('http://localhost:8080/walletBalance/'+wid)
+              .then(res => {
+
+                this.$notify({
+                  title: '成功',
+                  message: '钱包连接成功',
+                  type: 'success'
+                });
+
+                this.balance = res.data.balance;
+                this.address = res.data.address;
+                this.usdtBalance = res.data.usdtBalance;
+                this.loading = false;
+
+          
+              })
+              .catch(error => {
+                this.loading = false;
+                console.error('请求失败:', error);
+            });
+
+          } else {
+            console.log('连接已过期');
+            this.$notify.error({
+              title: '失败',
+              message: '连接钱包失败请重试.'
+            });
+            Cookies.set('wid',"");
+            this.$router.push('/');
+          }
+      });
+    },
+
     handleSendClick(){
-      console.log("gotosend");
-      
       this.$router.push('/send');
     },
 

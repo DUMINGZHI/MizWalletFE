@@ -198,23 +198,6 @@
           return;
         }
 
-        //1.Gas check
-        // axios.get('http://localhost:8080/checkGas')
-        // .then(res => {
-        //   if(!res.data){
-        //       this.$notify.error({
-        //         title: '转账失败',
-        //         message: 'Gas费不足.'
-        //       });
-        //       this.loading = false;
-        //     return;
-        //   }
-        // })
-        // .catch(error => {
-        //   this.loading = false;
-        //   console.error('请求失败:', error);
-        //   return;
-        // });
       
         let transaction = {
           value:this.transferAmount,

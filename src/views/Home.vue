@@ -154,6 +154,7 @@
 <script>
 
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export default {
   name: 'HelloWorld',
@@ -298,10 +299,9 @@ export default {
             }
           }).then(res => {
 
-            this.$store.commit('setConnectedAddress', res);
-            this.$store.commit('setPrivateKey', this.privateKey);
-
+            Cookies.set('wid', res.data);
             this.$router.push('/wallet');
+
           }).catch(error => {
             console.error('连接失败:', error);
           });
@@ -324,11 +324,10 @@ export default {
             'Content-Type': 'application/json'  // 明确设置 Content-Type
           }
         }).then(res => {
-  
-          this.$store.commit('setConnectedAddress', res.data.address);
-          this.$store.commit('setPrivateKey', res.data.privateKey);
 
+          sessionStorage.setItem('wid',res.data);
           this.$router.push('/wallet');
+          
         }).catch(error => {
           console.error('连接失败:', error);
         });
